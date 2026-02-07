@@ -1,0 +1,52 @@
+{
+  "name": "artzy",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "next": "^14.2.35",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@prisma/client": "^5.19.1",
+    "prisma": "^5.19.1",
+    "bcryptjs": "^2.4.3",
+    "next-auth": "^4.24.7",
+    "stripe": "^17.1.0",
+    "@stripe/stripe-js": "^4.1.0",
+    "@stripe/react-stripe-js": "^2.9.0",
+    "zod": "^3.23.8",
+    "react-hook-form": "^7.52.1",
+    "@hookform/resolvers": "^3.9.0",
+    "cloudinary": "^2.6.0",
+    "next-cloudinary": "^5.20.0",
+    "resend": "^4.0.0",
+    "date-fns": "^3.6.0",
+    "recharts": "^2.12.7",
+    "jspdf": "^2.5.2",
+    "html2canvas": "^1.4.1",
+    "lucide-react": "^0.427.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "@types/node": "^20.14.12",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/bcryptjs": "^2.4.6",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.40",
+    "tailwindcss": "^3.4.7",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.35"
+  }
+}

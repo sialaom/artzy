@@ -1,0 +1,75 @@
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+// Format price in TND
+export function formatPrice(price: number): string {
+  return new Intl.NumberFormat("fr-TN", {
+    style: "currency",
+    currency: "TND",
+    minimumFractionDigits: 3,
+  }).format(price);
+}
+
+// Format Tunisian phone number
+export function formatTunisianPhone(phone: string): string {
+  const cleaned = phone.replace(/\D/g, "");
+  if (cleaned.startsWith("216")) {
+    return `+${cleaned}`;
+  }
+  if (cleaned.startsWith("0")) {
+    return `+216${cleaned.slice(1)}`;
+  }
+  return `+216${cleaned}`;
+}
+
+// Validate Tunisian phone number
+export function isValidTunisianPhone(phone: string): boolean {
+  const cleaned = phone.replace(/\D/g, "");
+  return cleaned.length === 8 && cleaned.startsWith("9") || cleaned.length === 11 && cleaned.startsWith("2169");
+}
+
+// Tunisian governorates
+export const TUNISIAN_GOVERNORATES = [
+  "Ariana",
+  "Béja",
+  "Ben Arous",
+  "Bizerte",
+  "Gabès",
+  "Gafsa",
+  "Jendouba",
+  "Kairouan",
+  "Kasserine",
+  "Kébili",
+  "Kef",
+  "Mahdia",
+  "Manouba",
+  "Médenine",
+  "Monastir",
+  "Nabeul",
+  "Sfax",
+  "Sidi Bouzid",
+  "Siliana",
+  "Sousse",
+  "Tataouine",
+  "Tozeur",
+  "Tunis",
+  "Zaghouan",
+];
+
+// Calculate shipping cost by governorate
+export function calculateShippingCost(governorate: string): number {
+  const capital = ["Tunis", "Ariana", "Ben Arous", "Manouba"];
+  const coastal = ["Sfax", "Sousse", "Monastir", "Nabeul", "Bizerte"];
+  
+  if (capital.includes(governorate)) {
+    return 5; // 5 TND
+  }
+  if (coastal.includes(governorate)) {
+    return 8; // 8 TND
+  }
+  return 12; // 12 TND for other governorates
+}
