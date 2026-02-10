@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
@@ -21,13 +21,7 @@ export default function ProfilePage() {
         confirmPassword: "",
     });
 
-    useEffect(() => {
-        if (session) {
-            fetchProfile();
-        }
-    }, [session]);
-
-    const fetchProfile = async () => {
+    const fetchProfile = useCallback(async () => {
         try {
             const response = await fetch("/api/user/profile");
             if (response.ok) {
@@ -45,7 +39,13 @@ export default function ProfilePage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [formData]);
+
+    useEffect(() => {
+        if (session) {
+            fetchProfile();
+        }
+    }, [session, fetchProfile]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });

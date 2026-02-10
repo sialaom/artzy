@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { formatPrice } from "@/lib/utils";
 import { Package, ShoppingCart, Users, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,11 +26,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     setLoading(true);
     setError(false);
     try {
@@ -44,7 +40,11 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   if (loading) {
     return <div className="text-center py-12">Chargement...</div>;
@@ -68,7 +68,7 @@ export default function AdminDashboard() {
         <div className="bg-white p-6 rounded-lg shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 text-sm">Chiffre d'affaires</p>
+              <p className="text-gray-600 text-sm">Chiffre d&apos;affaires</p>
               <p className="text-2xl font-bold mt-2">{formatPrice(stats.totalRevenue)}</p>
             </div>
             <TrendingUp className="w-8 h-8 text-green-500" />

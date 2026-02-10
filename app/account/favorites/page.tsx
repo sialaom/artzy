@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingBag, Trash2 } from "lucide-react";
@@ -28,13 +28,7 @@ export default function FavoritesPage() {
     const [favorites, setFavorites] = useState<Favorite[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (session) {
-            fetchFavorites();
-        }
-    }, [session]);
-
-    const fetchFavorites = async () => {
+    const fetchFavorites = useCallback(async () => {
         try {
             const response = await fetch("/api/user/favorites");
             if (response.ok) {
@@ -46,7 +40,13 @@ export default function FavoritesPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        if (session) {
+            fetchFavorites();
+        }
+    }, [session, fetchFavorites]);
 
     const removeFavorite = async (productId: string) => {
         try {
@@ -94,7 +94,7 @@ export default function FavoritesPage() {
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900">Votre liste est vide</h3>
                     <p className="text-gray-500 mt-2 max-w-md mx-auto">
-                        Vous n'avez pas encore ajouté de coups de cœur. Explorez nos produits et cliquez sur le cœur pour les enregistrer ici.
+                        Vous n&apos;avez pas encore ajouté de coups de cœur. Explorez nos produits et cliquez sur le cœur pour les enregistrer ici.
                     </p>
                     <Link href="/products" className="mt-8 inline-block">
                         <Button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-8 py-6 h-auto text-lg">

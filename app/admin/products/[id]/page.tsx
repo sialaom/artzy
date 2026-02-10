@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
@@ -25,11 +25,7 @@ export default function EditProductPage() {
         images: [] as string[],
     });
 
-    useEffect(() => {
-        fetchData();
-    }, [productId]);
-
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             const [categoriesRes, productRes] = await Promise.all([
                 fetch("/api/admin/categories"),
@@ -61,7 +57,11 @@ export default function EditProductPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [productId]);
+
+    useEffect(() => {
+        fetchData();
+    }, [productId, fetchData]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;

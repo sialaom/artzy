@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2, X, Check } from "lucide-react";
 
@@ -21,11 +21,7 @@ export default function AdminCategoriesPage() {
     const [isAdding, setIsAdding] = useState(false);
     const [error, setError] = useState("");
 
-    useEffect(() => {
-        fetchCategories();
-    }, []);
-
-    const fetchCategories = async () => {
+    const fetchCategories = useCallback(async () => {
         try {
             const response = await fetch("/api/admin/categories");
             if (response.ok) {
@@ -37,7 +33,11 @@ export default function AdminCategoriesPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchCategories();
+    }, [fetchCategories]);
 
     const handleAdd = async () => {
         if (!newName.trim()) return;
