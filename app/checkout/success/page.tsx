@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -11,19 +11,19 @@ export default function CheckoutSuccessPage() {
   const orderId = searchParams.get("orderId");
   const [order, setOrder] = useState<any>(null);
 
-  useEffect(() => {
-    if (orderId) {
-      fetchOrder();
-    }
-  }, [orderId]);
-
-  const fetchOrder = async () => {
+  const fetchOrder = useCallback(async () => {
     const response = await fetch(`/api/orders/${orderId}`);
     if (response.ok) {
       const data = await response.json();
       setOrder(data);
     }
-  };
+  }, [orderId]);
+
+  useEffect(() => {
+    if (orderId) {
+      fetchOrder();
+    }
+  }, [orderId, fetchOrder]);
 
   return (
     <div className="container mx-auto px-4 py-12">

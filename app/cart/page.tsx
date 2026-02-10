@@ -100,7 +100,7 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between text-sm text-gray-500">
                 <span>Livraison</span>
-                <span>Calculé à l'étape suivante</span>
+                <span>Calculé à l&apos;étape suivante</span>
               </div>
             </div>
             <div className="border-t pt-4 mb-6">

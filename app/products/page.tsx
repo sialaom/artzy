@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
@@ -34,15 +34,7 @@ export default function ProductsPage() {
     sort: "newest",
   });
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    fetchProducts();
-  }, [filters]);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await fetch("/api/categories");
       if (response.ok) {
@@ -52,9 +44,9 @@ export default function ProductsPage() {
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
-  };
+  }, []);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (filters.categoryId) params.append("categoryId", filters.categoryId);
@@ -67,7 +59,15 @@ export default function ProductsPage() {
     const data = await response.json();
     setProducts(data);
     setLoading(false);
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -176,7 +176,7 @@ export default function ProductsPage() {
                     />
                   ) : (
                     <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                      <span className="text-gray-400">Pas d'image</span>
+                      <span className="text-gray-400">Pas d&apos;image</span>
                     </div>
                   )}
                   {product.isCustomizable && (

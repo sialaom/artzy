@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface CustomizationOptions {
   colors?: string[];
@@ -69,9 +70,8 @@ export default function ProductCustomization({
               <button
                 key={c}
                 onClick={() => setColor(c)}
-                className={`w-10 h-10 rounded-full border-2 ${
-                  color === c ? "border-gray-800" : "border-gray-300"
-                }`}
+                className={`w-10 h-10 rounded-full border-2 ${color === c ? "border-gray-800" : "border-gray-300"
+                  }`}
                 style={{ backgroundColor: c }}
               />
             ))}
@@ -102,7 +102,13 @@ export default function ProductCustomization({
           />
           {uploadedImage && (
             <div className="mt-2 relative h-32 w-32">
-              <img src={uploadedImage} alt="Preview" className="object-cover rounded" />
+              <Image
+                src={uploadedImage}
+                alt="Preview"
+                fill
+                className="object-cover rounded"
+                unoptimized
+              />
             </div>
           )}
         </div>
