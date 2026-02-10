@@ -8,6 +8,7 @@ export interface CartItem {
   productImage: string;
   price: number;
   quantity: number;
+  stock: number;
   customization?: {
     text?: string;
     color?: string;
@@ -51,7 +52,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (existing) {
         return prev.map((i) =>
           i.productId === item.productId &&
-          JSON.stringify(i.customization) === JSON.stringify(item.customization)
+            JSON.stringify(i.customization) === JSON.stringify(item.customization)
             ? { ...i, quantity: i.quantity + item.quantity }
             : i
         );

@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-11-20.acacia",
+  apiVersion: "2025-02-24.acacia" as any,
 });
 
 export async function POST(request: Request) {
@@ -18,88 +18,105 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { items, shippingAddress, giftWrap, shippingCost } = body;
 
-    // Create order
-    const order = await prisma.order.create({
-      data: {
-        userId: session.user.id,
-        subtotal: body.items.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0),
-        shippingCost,
-        giftWrapCost: giftWrap ? 5 : 0,
-        total: body.items.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0) + shippingCost + (giftWrap ? 5 : 0),
-        status: "PENDING",
-        shippingAddressId: "", // Will be created below
-        customizations: items.map((item: any) => item.customization).filter(Boolean),
-      },
-    });
+    if (!items || items.length === 0) {
+      return NextResponse.json({ error: "Le panier est vide" }, { status: 400 });
+    }
 
-    // Create shipping address
-    const address = await prisma.address.create({
-      data: {
-        userId: session.user.id,
-        label: "Livraison",
-        firstName: shippingAddress.firstName,
-        lastName: shippingAddress.lastName,
-        phone: shippingAddress.phone,
-        governorate: shippingAddress.governorate,
-        city: shippingAddress.city,
-        street: shippingAddress.street,
-        postalCode: shippingAddress.postalCode,
-        isDefault: false,
-      },
-    });
-
-    // Update order with address
-    await prisma.order.update({
-      where: { id: order.id },
-      data: { shippingAddressId: address.id },
-    });
-
-    // Create order items
-    for (const item of items) {
-      const product = await prisma.product.findUnique({
-        where: { id: item.productId },
-      });
-
-      if (product) {
-        await prisma.orderItem.create({
-          data: {
-            orderId: order.id,
-            productId: item.productId,
-            quantity: item.quantity,
-            price: item.price,
-            customization: item.customization || null,
-          },
+    // Wrap everything in a transaction to ensure atomicity
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Verify stock for all items first
+      for (const item of items) {
+        const product = await tx.product.findUnique({
+          where: { id: item.productId },
         });
 
-        // Update stock
-        await prisma.product.update({
+        if (!product) {
+          throw new Error(`Produit ${item.productId} non trouvé`);
+        }
+
+        if (product.stock < item.quantity) {
+          throw new Error(`Stock insuffisant pour ${product.name} (Disponible: ${product.stock})`);
+        }
+      }
+
+      // 2. Create shipping address
+      const address = await tx.address.create({
+        data: {
+          userId: session.user.id,
+          label: "Livraison",
+          firstName: shippingAddress.firstName,
+          lastName: shippingAddress.lastName,
+          phone: shippingAddress.phone,
+          governorate: shippingAddress.governorate,
+          city: shippingAddress.city,
+          street: shippingAddress.street,
+          postalCode: shippingAddress.postalCode,
+          isDefault: false,
+        },
+      });
+
+      // 3. Calculate totals
+      const subtotal = items.reduce((sum: number, item: any) => sum + item.price * item.quantity, 0);
+      const giftWrapCost = giftWrap ? 5 : 0;
+      const total = subtotal + shippingCost + giftWrapCost;
+
+      // 4. Create order
+      const order = await tx.order.create({
+        data: {
+          userId: session.user.id,
+          shippingAddressId: address.id,
+          subtotal,
+          shippingCost,
+          giftWrapCost,
+          total,
+          status: "PENDING",
+          customizations: items.map((item: any) => item.customization).filter(Boolean),
+          items: {
+            create: items.map((item: any) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+              price: item.price,
+              customization: item.customization || null,
+            })),
+          },
+        },
+      });
+
+      // 5. Update stock for each product
+      for (const item of items) {
+        await tx.product.update({
           where: { id: item.productId },
           data: { stock: { decrement: item.quantity } },
         });
       }
-    }
 
-    // Create Stripe Payment Intent (in TND, multiply by 1000 for millimes)
+      return order;
+    });
+
+    // Create Stripe Payment Intent (outside transaction since it's an external API call)
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(order.total * 1000), // Convert TND to millimes
+      amount: Math.round(result.total * 1000), // Convert TND to millimes
       currency: "tnd",
       metadata: {
-        orderId: order.id,
+        orderId: result.id,
         userId: session.user.id,
       },
     });
 
     // Update order with payment intent
     await prisma.order.update({
-      where: { id: order.id },
+      where: { id: result.id },
       data: { stripePaymentIntentId: paymentIntent.id },
     });
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,
-      orderId: order.id,
+      orderId: result.id,
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message && error.message.includes("Stock insuffisant")) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     console.error("Checkout error:", error);
     return NextResponse.json(
       { error: "Erreur lors de la création de la commande" },

@@ -23,11 +23,12 @@ enum OrderStatus {
   CANCELLED
 }
 
-enum Category {
-  PERSONALIZED
-  GENERAL
-  GIFT_CARDS
-  GIFT_WRAP
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model User {
@@ -71,7 +72,8 @@ model Product {
   name              String
   description       String   @db.Text
   price             Float    // En TND
-  category          Category
+  categoryId        String
+  category          Category @relation(fields: [categoryId], references: [id])
   isCustomizable    Boolean  @default(false)
   customizationOptions Json? // {colors: [], maxTextLength: 100, allowImageUpload: false}
   images            String[] // URLs Cloudinary

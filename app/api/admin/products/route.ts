@@ -11,6 +11,7 @@ export async function GET(request: Request) {
     }
 
     const products = await prisma.product.findMany({
+      include: { category: true },
       orderBy: { createdAt: "desc" },
     });
 
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
       name,
       description,
       price,
-      category,
+      categoryId,
       isCustomizable,
       customizationOptions,
       images,
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
         name,
         description,
         price: parseFloat(price),
-        category,
+        categoryId,
         isCustomizable: isCustomizable || false,
         customizationOptions: customizationOptions || null,
         images: images || [],

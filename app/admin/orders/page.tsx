@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface Order {
   id: string;
@@ -70,12 +71,11 @@ export default function AdminOrdersPage() {
                   <select
                     value={order.status}
                     onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                    className={`px-2 py-1 rounded text-sm ${
-                      order.status === "DELIVERED" ? "bg-green-100 text-green-800" :
+                    className={`px-2 py-1 rounded text-sm ${order.status === "DELIVERED" ? "bg-green-100 text-green-800" :
                       order.status === "SHIPPED" ? "bg-blue-100 text-blue-800" :
-                      order.status === "CONFIRMED" ? "bg-yellow-100 text-yellow-800" :
-                      "bg-gray-100 text-gray-800"
-                    }`}
+                        order.status === "CONFIRMED" ? "bg-yellow-100 text-yellow-800" :
+                          "bg-gray-100 text-gray-800"
+                      }`}
                   >
                     <option value="PENDING">En attente</option>
                     <option value="CONFIRMED">Confirmée</option>
@@ -88,9 +88,11 @@ export default function AdminOrdersPage() {
                   {new Date(order.createdAt).toLocaleDateString("fr-FR")}
                 </td>
                 <td className="px-6 py-4">
-                  <Button variant="outline" size="sm">
-                    Voir détails
-                  </Button>
+                  <Link href={`/admin/orders/${order.id}`}>
+                    <Button variant="outline" size="sm">
+                      Voir détails
+                    </Button>
+                  </Link>
                 </td>
               </tr>
             ))}

@@ -56,6 +56,13 @@ export default function AdminLayout({
               Produits
             </Link>
             <Link
+              href="/admin/categories"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-100"
+            >
+              <BarChart3 className="w-5 h-5 rotate-90" />
+              Catégories
+            </Link>
+            <Link
               href="/admin/orders"
               className="flex items-center gap-3 px-6 py-3 hover:bg-gray-100"
             >

@@ -4,17 +4,18 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const category = searchParams.get("category");
+    const categoryId = searchParams.get("categoryId");
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
     const search = searchParams.get("search");
+    const sort = searchParams.get("sort");
 
     const where: any = {
       isActive: true,
     };
 
-    if (category) {
-      where.category = category;
+    if (categoryId) {
+      where.categoryId = categoryId;
     }
 
     if (minPrice || maxPrice) {
@@ -30,9 +31,14 @@ export async function GET(request: Request) {
       ];
     }
 
+    let orderBy: any = { createdAt: "desc" };
+    if (sort === "price_asc") orderBy = { price: "asc" };
+    if (sort === "price_desc") orderBy = { price: "desc" };
+    if (sort === "oldest") orderBy = { createdAt: "asc" };
+
     const products = await prisma.product.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy,
     });
 
     return NextResponse.json(products);

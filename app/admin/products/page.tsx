@@ -13,7 +13,7 @@ interface Product {
   stock: number;
   isActive: boolean;
   images: string[];
-  category: string;
+  category: { id: string; name: string };
 }
 
 export default function AdminProductsPage() {
@@ -25,10 +25,17 @@ export default function AdminProductsPage() {
   }, []);
 
   const fetchProducts = async () => {
-    const response = await fetch("/api/admin/products");
-    const data = await response.json();
-    setProducts(data);
-    setLoading(false);
+    try {
+      const response = await fetch("/api/admin/products");
+      if (response.ok) {
+        const data = await response.json();
+        setProducts(data);
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleToggleActive = async (id: string, isActive: boolean) => {
@@ -62,6 +69,7 @@ export default function AdminProductsPage() {
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Image</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Catégorie</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prix</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
@@ -84,6 +92,7 @@ export default function AdminProductsPage() {
                   )}
                 </td>
                 <td className="px-6 py-4 font-medium">{product.name}</td>
+                <td className="px-6 py-4 text-sm text-gray-500">{product.category?.name}</td>
                 <td className="px-6 py-4">{formatPrice(product.price)}</td>
                 <td className="px-6 py-4">
                   <span className={product.stock === 0 ? "text-red-600" : ""}>
@@ -91,9 +100,8 @@ export default function AdminProductsPage() {
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`px-2 py-1 rounded text-sm ${
-                    product.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                  }`}>
+                  <span className={`px-2 py-1 rounded text-sm ${product.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                    }`}>
                     {product.isActive ? "Actif" : "Inactif"}
                   </span>
                 </td>
