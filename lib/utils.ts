@@ -29,7 +29,12 @@ export function formatTunisianPhone(phone: string): string {
 // Validate Tunisian phone number
 export function isValidTunisianPhone(phone: string): boolean {
   const cleaned = phone.replace(/\D/g, "");
-  return cleaned.length === 8 && cleaned.startsWith("9") || cleaned.length === 11 && cleaned.startsWith("2169");
+  // Tunisian numbers are 8 digits long and start with 2, 4, 5, 7 or 9
+  // If including country code, they are 11 digits long and start with 216 followed by 2, 4, 5, 7 or 9
+  const isEightDigit = cleaned.length === 8 && /^[24579]/.test(cleaned);
+  const isElevenDigit = cleaned.length === 11 && /^216[24579]/.test(cleaned);
+  
+  return isEightDigit || isElevenDigit;
 }
 
 // Tunisian governorates

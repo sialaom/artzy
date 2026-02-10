@@ -135,6 +135,10 @@ Pour accéder au backoffice admin:
 - [ ] Améliorer l'interface de personnalisation
 - [ ] Ajouter des tests
 
+## 🚀 Déploiement Vercel
+
+**Guide détaillé** : Consultez [GUIDE_VERCEL.md](./GUIDE_VERCEL.md) pour configurer les variables d'environnement et faire fonctionner le site sur Vercel.
+
 ## 📄 Licence
 
 MIT
