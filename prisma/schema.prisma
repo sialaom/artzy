@@ -71,7 +71,8 @@ model Product {
   id                String   @id @default(cuid())
   name              String
   description       String   @db.Text
-  price             Float    // En TND
+  price             Float    // En TND (prix actuel)
+  originalPrice     Float?   // Prix avant promotion (optionnel)
   categoryId        String
   category          Category @relation(fields: [categoryId], references: [id])
   isCustomizable    Boolean  @default(false)
