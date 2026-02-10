@@ -4,7 +4,7 @@ import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2024-11-20.acacia",
+  apiVersion: "2025-02-24.acacia",
 });
 
 export async function POST(request: Request) {
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
   // Handle the event
   if (event.type === "payment_intent.succeeded") {
     const paymentIntent = event.data.object as Stripe.PaymentIntent;
-    
+
     // Update order status
     await prisma.order.update({
       where: { stripePaymentIntentId: paymentIntent.id },

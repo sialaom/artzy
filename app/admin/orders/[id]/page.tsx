@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -43,11 +43,7 @@ export default function OrderDetailsPage() {
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchOrder();
-    }, []);
-
-    const fetchOrder = async () => {
+    const fetchOrder = useCallback(async () => {
         try {
             const response = await fetch(`/api/admin/orders/${params.id}`);
             if (response.ok) {
@@ -59,7 +55,11 @@ export default function OrderDetailsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [params.id]);
+
+    useEffect(() => {
+        fetchOrder();
+    }, [fetchOrder]);
 
     if (loading) return <div className="text-center py-12">Chargement...</div>;
     if (!order) return <div className="text-center py-12">Commande non trouvée</div>;
@@ -80,9 +80,9 @@ export default function OrderDetailsPage() {
                     <p className="text-gray-500">Passée le {new Date(order.createdAt).toLocaleString("fr-FR")}</p>
                 </div>
                 <div className={`px-4 py-2 rounded-full font-bold text-sm ${order.status === "DELIVERED" ? "bg-green-100 text-green-800" :
-                        order.status === "SHIPPED" ? "bg-blue-100 text-blue-800" :
-                            order.status === "CONFIRMED" ? "bg-yellow-100 text-yellow-800" :
-                                "bg-gray-100 text-gray-800"
+                    order.status === "SHIPPED" ? "bg-blue-100 text-blue-800" :
+                        order.status === "CONFIRMED" ? "bg-yellow-100 text-yellow-800" :
+                            "bg-gray-100 text-gray-800"
                     }`}>
                     {order.status}
                 </div>
