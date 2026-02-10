@@ -67,7 +67,9 @@ Vercel est gratuit et optimisé pour Next.js. Il se connecte directement à GitH
    - `DATABASE_URL` - Base PostgreSQL (voir Neon ci-dessous)
    - `NEXTAUTH_URL` - URL de votre site (ex: https://artzy.vercel.app)
    - `NEXTAUTH_SECRET` - Clé secrète générée
-   - `STRIPE_*` - Clés Stripe (pour les paiements)
+   - `NEXTAUTH_SECRET` - Clé secrète générée
+   - `STRIPE_SECRET_KEY` - Clé secrète Stripe (sk_...)
+   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` - Clé publique Stripe (pk_...)
 
 4. **Déployer** - Vercel déploie automatiquement à chaque push sur GitHub !
 
