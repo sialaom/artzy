@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { formatPrice } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -19,18 +19,18 @@ export default function AccountPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (session) {
-      fetchOrders();
-    }
-  }, [session]);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     const response = await fetch("/api/orders");
     const data = await response.json();
     setOrders(data);
     setLoading(false);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (session) {
+      fetchOrders();
+    }
+  }, [session, fetchOrders]);
 
   if (!session) {
     return (
@@ -88,12 +88,11 @@ export default function AccountPage() {
                       </div>
                       <div className="text-right">
                         <p className="font-semibold">{formatPrice(order.total)}</p>
-                        <span className={`text-sm px-2 py-1 rounded ${
-                          order.status === "DELIVERED" ? "bg-green-100 text-green-800" :
-                          order.status === "SHIPPED" ? "bg-blue-100 text-blue-800" :
-                          order.status === "CONFIRMED" ? "bg-yellow-100 text-yellow-800" :
-                          "bg-gray-100 text-gray-800"
-                        }`}>
+                        <span className={`text-sm px-2 py-1 rounded ${order.status === "DELIVERED" ? "bg-green-100 text-green-800" :
+                            order.status === "SHIPPED" ? "bg-blue-100 text-blue-800" :
+                              order.status === "CONFIRMED" ? "bg-yellow-100 text-yellow-800" :
+                                "bg-gray-100 text-gray-800"
+                          }`}>
                           {order.status === "PENDING" && "En attente"}
                           {order.status === "CONFIRMED" && "Confirmée"}
                           {order.status === "SHIPPED" && "Expédiée"}
