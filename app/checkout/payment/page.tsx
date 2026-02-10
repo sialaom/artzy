@@ -6,7 +6,9 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 function CheckoutForm({ orderId }: { orderId: string }) {
   const stripe = useStripe();
@@ -69,9 +71,15 @@ export default function PaymentPage() {
       <div className="max-w-2xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Paiement sécurisé</h1>
         <div className="bg-white p-6 rounded-lg shadow">
-          <Elements stripe={stripePromise} options={options}>
-            {orderId && <CheckoutForm orderId={orderId} />}
-          </Elements>
+          {stripePromise && clientSecret ? (
+            <Elements stripe={stripePromise} options={options}>
+              {orderId && <CheckoutForm orderId={orderId} />}
+            </Elements>
+          ) : (
+            <div className="text-center p-6 bg-red-50 text-red-600 rounded-lg">
+              Configuration de paiement manquante. Veuillez vérifier les clés API Stripe.
+            </div>
+          )}
         </div>
       </div>
     </div>
