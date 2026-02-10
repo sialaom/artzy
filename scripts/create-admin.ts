@@ -1,28 +1,41 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
+import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = "siala.omar@gmail.com";
-  const hashedPassword = await bcrypt.hash("admin123", 10); // Default temporary password
+  console.log("Creating admin user...");
+  const email = "siala.oussema@gmail.com";
+  const password = "bezwich";
 
-  console.log(`Creating admin user: ${email}...`);
+  const hashedPassword = await hash(password, 12);
 
-  await prisma.user.upsert({
-    where: { email },
-    update: { role: "ADMIN" },
-    create: {
-      email,
-      password: hashedPassword,
-      firstName: "Omar",
-      lastName: "Siala",
-      phone: "+21622000000",
-      role: "ADMIN",
-    },
-  });
+  const existingUser = await prisma.user.findUnique({ where: { email } });
 
-  console.log("Admin user created/updated successfully.");
+  let user;
+  if (existingUser) {
+    user = await prisma.user.update({
+      where: { email },
+      data: {
+        password: hashedPassword,
+        role: "ADMIN"
+      }
+    });
+  } else {
+    user = await prisma.user.create({
+      data: {
+        email,
+        firstName: "Oussema",
+        lastName: "Siala",
+        phone: "+21600000000",
+        password: hashedPassword,
+        role: "ADMIN"
+      }
+    });
+  }
+
+  console.log(`✅ Admin user créé/mis à jour: ${user.email}`);
+  console.log(`🔑 Mot de passe: ${password}`);
 }
 
 main()

@@ -14,6 +14,7 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number;
   images: string[];
   category: string;
   isCustomizable: boolean;
@@ -159,9 +160,21 @@ export default function ProductPage() {
           <div className="mb-8">
             <h1 className="text-4xl font-black text-gray-900 mb-4">{product.name}</h1>
             <div className="flex items-center gap-4 mb-6">
-              <span className="text-3xl font-black text-indigo-600">
-                {formatPrice(product.price)}
-              </span>
+              <div className="flex flex-col">
+                {product.originalPrice && (
+                  <span className="text-lg text-gray-400 line-through">
+                    {formatPrice(product.originalPrice)}
+                  </span>
+                )}
+                <span className={`text-3xl font-black ${product.originalPrice ? 'text-red-600' : 'text-indigo-600'}`}>
+                  {formatPrice(product.price)}
+                </span>
+                {product.originalPrice && (
+                  <span className="text-sm font-bold text-green-600">
+                    Économisez {formatPrice(product.originalPrice - product.price)} (-{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%)
+                  </span>
+                )}
+              </div>
               {product.stock > 0 ? (
                 <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">En stock</span>
               ) : (

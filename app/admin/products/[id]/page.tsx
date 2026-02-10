@@ -18,6 +18,7 @@ export default function EditProductPage() {
         name: "",
         description: "",
         price: "",
+        originalPrice: "",
         categoryId: "",
         stock: "",
         isActive: true,
@@ -43,6 +44,7 @@ export default function EditProductPage() {
                     name: data.name,
                     description: data.description,
                     price: data.price.toString(),
+                    originalPrice: data.originalPrice ? data.originalPrice.toString() : "",
                     categoryId: data.categoryId,
                     stock: data.stock.toString(),
                     isActive: data.isActive,
@@ -81,6 +83,7 @@ export default function EditProductPage() {
                 body: JSON.stringify({
                     ...formData,
                     price: parseFloat(formData.price),
+                    originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
                     stock: parseInt(formData.stock),
                 }),
             });
@@ -137,7 +140,7 @@ export default function EditProductPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold">Prix (TND)</label>
+                        <label className="text-sm font-semibold">Prix actuel (TND) *</label>
                         <input
                             type="number"
                             step="0.001"
@@ -147,7 +150,29 @@ export default function EditProductPage() {
                             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
                             required
                         />
+                        <p className="text-xs text-gray-500">Le prix que les clients paieront</p>
                     </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold">Prix original (TND)</label>
+                        <input
+                            type="number"
+                            step="0.001"
+                            name="originalPrice"
+                            value={formData.originalPrice}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                            placeholder="Optionnel"
+                        />
+                        <p className="text-xs text-gray-500">Prix avant promotion (affiché barré)</p>
+                        {formData.originalPrice && formData.price && parseFloat(formData.originalPrice) > parseFloat(formData.price) && (
+                            <div className="bg-green-50 text-green-700 px-3 py-2 rounded-md text-xs font-bold">
+                                🎉 Réduction de {Math.round(((parseFloat(formData.originalPrice) - parseFloat(formData.price)) / parseFloat(formData.originalPrice)) * 100)}%
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <label className="text-sm font-semibold">Stock</label>
                         <input

@@ -16,6 +16,7 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number;
   images: string[];
   categoryId: string;
   isCustomizable: boolean;
@@ -198,9 +199,21 @@ export default function ProductsPage() {
                     {product.description}
                   </p>
                   <div className="flex items-center justify-between mt-auto">
-                    <span className="text-2xl font-black text-indigo-900">
-                      {formatPrice(product.price)}
-                    </span>
+                    <div className="flex flex-col">
+                      {product.originalPrice && (
+                        <span className="text-sm text-gray-400 line-through">
+                          {formatPrice(product.originalPrice)}
+                        </span>
+                      )}
+                      <span className={`text-2xl font-black ${product.originalPrice ? 'text-red-600' : 'text-indigo-900'}`}>
+                        {formatPrice(product.price)}
+                      </span>
+                      {product.originalPrice && (
+                        <span className="text-xs font-bold text-green-600">
+                          -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                        </span>
+                      )}
+                    </div>
                     <Button size="sm" className="rounded-full shadow-md">Voir</Button>
                   </div>
                 </div>

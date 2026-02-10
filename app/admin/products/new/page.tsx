@@ -15,6 +15,7 @@ export default function NewProductPage() {
         name: "",
         description: "",
         price: "",
+        originalPrice: "",
         categoryId: "",
         stock: "",
         isActive: true,
@@ -59,6 +60,7 @@ export default function NewProductPage() {
                 body: JSON.stringify({
                     ...formData,
                     price: parseFloat(formData.price),
+                    originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
                     stock: parseInt(formData.stock),
                     images: ["https://picsum.photos/seed/" + Math.random() + "/800/800"] // Default test image
                 }),
@@ -114,7 +116,7 @@ export default function NewProductPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold">Prix (TND)</label>
+                        <label className="text-sm font-semibold">Prix actuel (TND) *</label>
                         <input
                             type="number"
                             step="0.001"
@@ -124,7 +126,29 @@ export default function NewProductPage() {
                             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
                             required
                         />
+                        <p className="text-xs text-gray-500">Le prix que les clients paieront</p>
                     </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold">Prix original (TND)</label>
+                        <input
+                            type="number"
+                            step="0.001"
+                            name="originalPrice"
+                            value={formData.originalPrice}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                            placeholder="Optionnel"
+                        />
+                        <p className="text-xs text-gray-500">Prix avant promotion (affiché barré)</p>
+                        {formData.originalPrice && formData.price && parseFloat(formData.originalPrice) > parseFloat(formData.price) && (
+                            <div className="bg-green-50 text-green-700 px-3 py-2 rounded-md text-xs font-bold">
+                                🎉 Réduction de {Math.round(((parseFloat(formData.originalPrice) - parseFloat(formData.price)) / parseFloat(formData.originalPrice)) * 100)}%
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <label className="text-sm font-semibold">Stock</label>
                         <input
@@ -136,24 +160,24 @@ export default function NewProductPage() {
                             required
                         />
                     </div>
-                </div>
 
-                <div className="space-y-2">
-                    <label className="text-sm font-semibold">Catégorie</label>
-                    <select
-                        name="categoryId"
-                        value={formData.categoryId}
-                        onChange={handleChange}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                        required
-                    >
-                        <option value="">Sélectionner une catégorie</option>
-                        {categories.map((cat) => (
-                            <option key={cat.id} value={cat.id}>
-                                {cat.name}
-                            </option>
-                        ))}
-                    </select>
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold">Catégorie</label>
+                        <select
+                            name="categoryId"
+                            value={formData.categoryId}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                            required
+                        >
+                            <option value="">Sélectionner une catégorie</option>
+                            {categories.map((cat) => (
+                                <option key={cat.id} value={cat.id}>
+                                    {cat.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-6 pt-4">
