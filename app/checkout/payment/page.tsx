@@ -46,7 +46,9 @@ function CheckoutForm({ orderId }: { orderId: string }) {
   );
 }
 
-export default function PaymentPage() {
+import { Suspense } from "react";
+
+function PaymentContent() {
   const searchParams = useSearchParams();
   const clientSecret = searchParams.get("clientSecret");
   const orderId = searchParams.get("orderId");
@@ -83,5 +85,13 @@ export default function PaymentPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-12 text-center">Chargement du paiement...</div>}>
+      <PaymentContent />
+    </Suspense>
   );
 }
